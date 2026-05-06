@@ -38,7 +38,7 @@ bash install.sh
 ## 📂 2. Dataset Acquisition (Hugging Face)
 We use a standardized Hindi dataset for the best results.
 
-1.  **Download from Hugging Face**: [iamshreeji-copy1/Hindi_TTS_GPT_SoVITS]([https://huggingface.co/datasets/iamshreeji-copy1/Hindi_TTS_GPT_SoVITS](https://huggingface.co/iamshreeji-copy1/Hindi_TTS_GPT_SoVITS/tree/main))
+1.  **Download from Hugging Face**: [iamshreeji-copy1/Hindi_TTS_GPT_SoVITS](https://huggingface.co/iamshreeji-copy1/Hindi_TTS_GPT_SoVITS/tree/main)
 2.  **Format**: The dataset is in **LJSpeech format** (a zip file containing a `wavs` folder and a `metadata.csv` file).
 3.  **Extraction**:
     - Extract the zip file into the `dataset/` folder.
