@@ -1,142 +1,126 @@
-# 🇮🇳 Hindi TTS - GPT-SoVITS 🚀
+# 🇮🇳 Hindi TTS - GPT-SoVITS (In-Depth Guide) 🚀
 
-Welcome to the **Hindi TTS** project! This repository is a specialized version of the powerful [GPT-SoVITS](https://github.com/RVC-Boss/GPT-SoVITS) framework, optimized specifically for the **Hindi language**.
-
-Whether you are a researcher, developer, or a hobbyist, this guide will help you set up and train your own Hindi voice model from scratch.
+This repository is a specialized, feature-rich version of the **GPT-SoVITS** framework, tailor-made for high-quality **Hindi Text-to-Speech (TTS)**. Whether you have zero coding experience or are a seasoned pro, this guide will take you from installation to generating your first Hindi voice clone.
 
 ---
 
-## 📋 Table of Contents
-1. [Introduction](#introduction)
-2. [Environmental Setup](#environmental-setup)
-3. [Dataset Acquisition](#dataset-acquisition)
-4. [Phonetics & Language Support](#phonetics--language-support)
-5. [Training Workflow](#training-workflow)
-6. [Inference](#inference)
-7. [Fine-Tuning](#fine-tuning)
+## 📖 Project Overview
+GPT-SoVITS is a powerful "few-shot" voice cloning tool. This version adds:
+- **Full Hindi Support**: Native processing for Devanagari script.
+- **Phonetic Accuracy**: Uses a custom ARPA-based system for natural Hindi pronunciation.
+- **Dataset Ready**: Pre-configured to work with common Hindi datasets on Hugging Face.
 
 ---
 
-## 🌟 Introduction
-This project provides:
-- **Hindi (`hi`) Support**: Native phonemization and text normalization for Devanagari script.
-- **Easy Preprocessing**: Scripts to convert LJSpeech-style datasets into GPT-SoVITS format.
-- **High Quality**: Leverages the state-of-the-art GPT-SoVITS v2 architecture.
+## 🛠️ 1. Environmental Setup (Step-by-Step)
+Follow these commands exactly to set up your training environment.
 
----
+### A. Install Conda
+If you don't have it, download [Miniconda](https://docs.conda.io/en/latest/miniconda.html).
 
-## 💻 Environmental Setup
-Follow these steps to prepare your computer for training.
-
-### 1. Install Anaconda/Miniconda
-If you don't have it, download and install [Conda](https://docs.conda.io/en/latest/miniconda.html).
-
-### 2. Create the Environment
+### B. Create & Activate Environment
 ```bash
-# Create a new environment named GPTSoVits
+# Create the environment
 conda create -n GPTSoVits python=3.10 -y
 
-# Activate the environment
+# Activate it
 conda activate GPTSoVits
 ```
 
-### 3. Install Dependencies
+### C. Install the Software
 ```bash
-# Install the core project and its requirements
+# This installs all necessary libraries (PyTorch, Transformers, etc.)
 bash install.sh
 ```
 
 ---
 
-## 📂 Dataset Acquisition
-We use a high-quality Hindi dataset hosted on Hugging Face.
+## 📂 2. Dataset Acquisition (Hugging Face)
+We use a standardized Hindi dataset for the best results.
 
-### 1. Download the Dataset
-You can find the dataset at: [iamshreeji-copy1/Hindi_TTS_GPT_SoVITS](https://huggingface.co/datasets/iamshreeji-copy1/Hindi_TTS_GPT_SoVITS)
+1.  **Download from Hugging Face**: [iamshreeji-copy1/Hindi_TTS_GPT_SoVITS](https://huggingface.co/datasets/iamshreeji-copy1/Hindi_TTS_GPT_SoVITS)
+2.  **Format**: The dataset is in **LJSpeech format** (a zip file containing a `wavs` folder and a `metadata.csv` file).
+3.  **Extraction**:
+    - Extract the zip file into the `dataset/` folder.
+    - Path should look like: `dataset/wavs/*.wav` and `dataset/metadata.csv`.
 
-### 2. Prepare the Files
-1. Download the `Hindi_Dataset.zip` file.
-2. Extract it into a folder named `dataset/`.
-3. The dataset should be in **LJSpeech format**:
-   - `wavs/`: Contains your `.wav` audio files.
-   - `metadata.csv`: Contains `audio_filename|text`.
-
-### 3. Convert to Training List
-Run this command to generate the `train.list` file required for training:
+### 📝 Convert Dataset for Training
+Run the helper script to create the `train.list` file which the model needs:
 ```bash
 python create_train_list.py
 ```
-*(Ensure you update the paths inside `create_train_list.py` to match your local dataset folder.)*
+*Note: Open `create_train_list.py` and make sure the `dataset_root` path points to your extracted folder.*
 
 ---
 
-## 🗣️ Phonetics & Language Support
-This project uses a refined **ARPA-based Phonetic Mapping** for Hindi. 
+## 🗣️ 3. Phonetics: How it Works
+This project uses a **Refined ARPA Mapping** for Hindi.
 
-- **Transliteration**: We convert Devanagari (हिन्दी) to ITRANS (Latin) using the `indic-transliteration` library.
-- **Phoneme Mapping**: Each ITRANS character is mapped to standard ARPA symbols (e.g., `नमस्ते` -> `N AH0 M AH0 S T EY1`).
-- **Punctuation**: Full support for `. , ! ?` to handle speech prosody.
-
-This ensures that the model understands the unique sounds of Hindi vowels and consonants accurately.
+- **What are Phonetics?**: It's how we tell the computer exactly how a word sounds. 
+- **The Process**: 
+  1.  **Devanagari** (हिन्दी) is transliterated to **ITRANS** (Latin script).
+  2.  **ITRANS** is then mapped to **ARPA symbols** (standard phonetic labels used in speech research).
+  3.  Example: `नमस्ते` -> `N AH0 M AH0 S T EY1`.
+- **Why this matters**: It allows the model to capture the subtle nuances of Hindi vowels (like 'अ' vs 'आ') and consonants accurately.
 
 ---
 
-## 🛠️ Training Workflow
-Training happens in two main stages.
+## 🏗️ 4. Training (The A-to-Z Workflow)
+Training is done in two "Stages". Think of Stage 1 as the model learning the *language*, and Stage 2 as it learning the *voice*.
 
-### Pre-processing (Data Prep)
-Run these in order to extract features:
+### Step A: Feature Extraction (Preparing the Data)
+Run these commands one by one:
 ```bash
-# Step 1A: Text & BERT Features
-export inp_text="train.list"; export exp_name="hindi_v1"; python GPT_SoVITS/prepare_datasets/1-get-text.py
+# 1. Extract Text & BERT features
+export inp_text="train.list"; export exp_name="Hindi_Model_v1"; python GPT_SoVITS/prepare_datasets/1-get-text.py
 
-# Step 1B: Audio Features (Hubert)
+# 2. Extract Audio features (Hubert)
 python GPT_SoVITS/prepare_datasets/2-get-hubert-wav32k.py
 
-# Step 1C: Semantic Features
+# 3. Extract Semantic features
 python GPT_SoVITS/prepare_datasets/3-get-semantic.py
 ```
 
-### Stage 1: GPT Training (Text to Semantic)
-This teaches the model "how to speak" the text.
+### Step B: Stage 1 Training (GPT)
 ```bash
 python GPT_SoVITS/s1_train.py --config_file "GPT_SoVITS/configs/s1longer-v2.yaml"
 ```
 
-### Stage 2: SoVITS Training (Semantic to Audio)
-This teaches the model "the voice quality".
+### Step C: Stage 2 Training (SoVITS)
 ```bash
 python GPT_SoVITS/s2_train.py --config "GPT_SoVITS/configs/s2.json"
 ```
 
 ---
 
-## 🎯 Fine-Tuning
-If you already have a pre-trained model and want to teach it a specific new voice:
-1. Load the pre-trained weights in the WebUI.
-2. Reduce the number of epochs (e.g., 10-20 for GPT, 50 for SoVITS).
-3. Run the training scripts above using your new dataset.
+## 🚀 5. Inference (Generating Speech)
+Once trained, you can use the **WebUI** to generate speech.
+
+1.  **Start the UI**:
+    ```bash
+    python webui.py
+    ```
+2.  **In the Browser**:
+    - Go to the **Inference** tab.
+    - Load your GPT model (`.ckpt`) and SoVITS model (`.pth`).
+    - Input a **Reference Audio** (the voice you want to copy).
+    - Type your **Target Hindi Text**.
+    - Click **Generate**.
 
 ---
 
-## 🔊 Inference
-To generate speech using your trained model:
-
-### Using WebUI (Recommended for beginners)
-```bash
-python webui.py
-```
-1. Open the URL shown in your terminal (usually `http://localhost:9874`).
-2. Go to the "Inference" tab.
-3. Select your trained `.ckpt` (GPT) and `.pth` (SoVITS) files.
-4. Type your Hindi text and click **Generate**.
+## 🔄 6. Fine-Tuning
+If you want to train on a **small amount of data** (e.g., only 1 minute of a specific person's voice):
+1. Use the pre-trained weights located in `GPT_SoVITS/pretrained_models/`.
+2. Follow the training steps above but for fewer **Epochs** (e.g., 10-15 for GPT).
+3. This "fine-tunes" the existing knowledge to a new voice quickly.
 
 ---
 
 ## 🔗 Quick Links
-- 📖 [Hindi Training Deep Dive](./hindi_tts_training_file.md)
-- 🧪 [Original GPT-SoVITS README](./README_ORIGINAL.md)
-- 🐍 [Hindi Phonemizer Logic](./GPT_SoVITS/text/hindi.py)
+- 📖 [Step-by-Step Training Deep Dive](./hindi_tts_training_file.md)
+- 🧪 [Original GPT-SoVITS Docs](./README_ORIGINAL.md)
+- 🐍 [Hindi Phonemizer Source](./GPT_SoVITS/text/hindi.py)
 
 ---
-*Developed with ❤️ for the Hindi community. Based on the open-source [GPT-SoVITS](https://github.com/RVC-Boss/GPT-SoVITS) project.*
+*Created for the Hindi AI Community. Based on the open-source [GPT-SoVITS](https://github.com/RVC-Boss/GPT-SoVITS) project.*
