@@ -13,9 +13,19 @@ from AR.data.data_module import Text2SemanticDataModule
 from AR.models.t2s_lightning_module import Text2SemanticLightningModule
 from AR.utils.io import load_yaml_config
 from pytorch_lightning import Trainer, seed_everything
-from pytorch_lightning.callbacks import ModelCheckpoint
+from pytorch_lightning.callbacks import ModelCheckpoint, TQDMProgressBar
 from pytorch_lightning.loggers import TensorBoardLogger  # WandbLogger
 from pytorch_lightning.strategies import DDPStrategy
+
+class SimpleProgressLogger(TQDMProgressBar):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.last_log_step = -1
+
+    def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
+        super().on_train_batch_end(trainer, pl_module, outputs, batch, batch_idx)
+        if trainer.global_step % 10 == 0:
+            print(f"Epoch {trainer.current_epoch}, Step {trainer.global_step}, Loss: {trainer.callback_metrics.get('total_loss_step', 'N/A')}", flush=True)
 
 logging.getLogger("numba").setLevel(logging.WARNING)
 logging.getLogger("matplotlib").setLevel(logging.WARNING)
@@ -108,6 +118,7 @@ def main(args):
     logger = TensorBoardLogger(name=output_dir.stem, save_dir=output_dir)
     os.environ["MASTER_ADDR"] = "localhost"
     os.environ["USE_LIBUV"] = "0"
+    progress_bar = SimpleProgressLogger(refresh_rate=10)
     trainer: Trainer = Trainer(
         max_epochs=config["train"]["epochs"],
         accelerator="gpu" if torch.cuda.is_available() else "cpu",
@@ -123,7 +134,8 @@ def main(args):
         precision=config["train"]["precision"],
         logger=logger,
         num_sanity_val_steps=0,
-        callbacks=[ckpt_callback],
+        callbacks=[ckpt_callback, progress_bar],
+        log_every_n_steps=1,
         use_distributed_sampler=False,  # 非常简单的修改，但解决了采用自定义的 bucket_sampler 下训练步数不一致的问题！
     )
 

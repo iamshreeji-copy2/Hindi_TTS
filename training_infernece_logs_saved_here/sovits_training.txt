@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/media/linux/Seagate/ravi_phd/gpt_sovits/GPT-SoVITS/GPT_SoVITS/s2_train.py", line 28, in <module>
+    from module.data_utils import (
+  File "/media/linux/Seagate/ravi_phd/gpt_sovits/GPT-SoVITS/GPT_SoVITS/module/data_utils.py", line 11, in <module>
+    from tools.my_utils import load_audio
+ModuleNotFoundError: No module named 'tools'
+ERROR conda.cli.main_run:execute(142): `conda run python -u GPT_SoVITS/s2_train.py --config logs/Hindi_Model_v1/s2.json` failed. (See above for error)
