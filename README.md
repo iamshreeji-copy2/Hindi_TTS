@@ -82,14 +82,29 @@ python GPT_SoVITS/prepare_datasets/3-get-semantic.py
 ```
 
 ### Step B: Stage 1 Training (GPT)
-```bash
-python GPT_SoVITS/s1_train.py --config_file "GPT_SoVITS/configs/s1longer-v2.yaml"
-```
+In this step, the model learns the "grammar" and "rhythm" of the voice.
+
+1. **Setup the Config**: Copy the default settings to your project folder so you can customize them if needed.
+   ```bash
+   mkdir -p logs/Hindi_Model_v1
+   cp GPT_SoVITS/configs/s1longer-v2.yaml logs/Hindi_Model_v1/s1.yaml
+   ```
+2. **Start Training**:
+   ```bash
+   python GPT_SoVITS/s1_train.py --config_file "logs/Hindi_Model_v1/s1.yaml"
+   ```
 
 ### Step C: Stage 2 Training (SoVITS)
-```bash
-python GPT_SoVITS/s2_train.py --config "GPT_SoVITS/configs/s2.json"
-```
+In this step, the model learns the exact "texture" and "tone" of the voice.
+
+1. **Setup the Config**:
+   ```bash
+   cp GPT_SoVITS/configs/s2.json logs/Hindi_Model_v1/s2.json
+   ```
+2. **Start Training**:
+   ```bash
+   python GPT_SoVITS/s2_train.py --config "logs/Hindi_Model_v1/s2.json"
+   ```
 
 ---
 
